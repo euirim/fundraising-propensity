@@ -19,8 +19,10 @@ class GoFundMeSitemapSpider(SitemapSpider):
         title = response.css('.a-campaign-title::text').get()
 
         # story
-        story = response.css('.o-campaign-story::text').extract()
-        story = ' '.join(story).replace('\xa0', ' ')
+        story = response.css('.o-campaign-story p::text').extract()
+        if len(story) == 0:
+            story = response.css('.o-campaign-story::text').extract()
+        story = ' '.join(story).replace('\xa0', ' ').replace('&nbsp;', ' ')
 
         # created
         created = response.css(
@@ -34,8 +36,14 @@ class GoFundMeSitemapSpider(SitemapSpider):
         raised = int(raised.replace('$', '').replace(',', ''))
 
         # goal
-        goal = finances.css('.text-stat::text').get().split()[-2]
-        goal = int(goal.replace('$', '').replace(',', ''))
+        text_stat = finances.css('.text-stat::text').get().split()
+        finished = False
+        goal = None
+        if text_stat[-1].strip() == 'raised':
+            finished = True
+        else:
+            goal = finances.css('.text-stat::text').get().split()[-2]
+            goal = int(goal.replace('$', '').replace(',', ''))
 
         # category
         category = response.css('.m-campaign-byline-type::text').get()
@@ -47,6 +55,7 @@ class GoFundMeSitemapSpider(SitemapSpider):
             'raised': raised,
             'goal': goal,
             'category': category,
+            'finished': int(finished)
         }
 
     def sitemap_filter(self, entries):
