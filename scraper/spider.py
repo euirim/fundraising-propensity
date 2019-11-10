@@ -15,6 +15,9 @@ class GoFundMeSitemapSpider(SitemapSpider):
     }
 
     def parse_f(self, response):
+        # url
+        url = response.url
+
         # title
         title = response.css('.a-campaign-title::text').get()
 
@@ -48,14 +51,26 @@ class GoFundMeSitemapSpider(SitemapSpider):
         # category
         category = response.css('.m-campaign-byline-type::text').get()
 
+        # first cover image
+        cover_image_style = response.css('div.a-image').get()
+        first_cover_image = cover_image_style[
+            cover_image_style.find("(")+1:cover_image_style.find(")")
+        ]
+
+        # story images
+        story_images = response.css('.o-campaign-story img::attr(src)').extract()
+
         yield {
+            'url': url,
             'title': title,
             'story': story,
             'created': created,
             'raised': raised,
             'goal': goal,
             'category': category,
-            'finished': int(finished)
+            'finished': int(finished),
+            'first_cover_image': first_cover_image,
+            'story_images': story_images,
         }
 
     def sitemap_filter(self, entries):
