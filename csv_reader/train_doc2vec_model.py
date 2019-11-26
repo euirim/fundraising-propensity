@@ -38,9 +38,8 @@ print("Initializing model...")
 model = gensim.models.Doc2Vec(size=300, window=10, min_count=5, workers=11,alpha=0.025, min_alpha=0.025) # use fixed learning rate
 print("Building vocab...")
 model.build_vocab(it)
-print("Training model...")
-model.train(it, total_examples=model.corpus_count, epochs=model.epochs, report_delay=5)
+print("Training model with {} examples and {} epochs...".format(model.corpus_count, 15))
+model.train(it, total_examples=model.corpus_count, epochs=15, report_delay=5)
 print("Saving model...")
 model.save(os.path.join('data','story_doc2vec.model'))
-
 
