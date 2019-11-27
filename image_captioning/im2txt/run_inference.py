@@ -21,7 +21,6 @@ from __future__ import print_function
 import math
 import os
 import urllib
-import cStringIO
 
 import tensorflow as tf
 from PIL import Image
@@ -42,7 +41,6 @@ tf.flags.DEFINE_string("input_image_urls", "",
                        "of image files.")
 
 tf.logging.set_verbosity(tf.logging.INFO)
-
 
 def main(_):
   # Build the inference graph.
@@ -73,9 +71,11 @@ def main(_):
     if not os.path.exists('./captions'):
       os.makedirs('./captions') 
 
-    for url in image_urls:
+    num_failed = 0
+    for num_images_captioned, url in enumerate(image_urls):
       if not url:
         print("ERROR: URL is empty.")
+        num_failed += 1
         continue
 
       url = url.strip()
@@ -84,34 +84,44 @@ def main(_):
         urllib.urlretrieve(url, 'image_tmp')
       except:
         print("ERROR: Image download failed.")
+        num_failed += 1
         continue
 
       with tf.gfile.GFile('image_tmp', "rb") as f:
         image = f.read()
 
-      captions = generator.beam_search(sess, image)
-      final_caption = None
-      print("Captions for image %s:" % url)
-      for i, caption in enumerate(captions):
-        # Ignore begin and end words.
-        sentence = [vocab.id_to_word(w) for w in caption.sentence[1:-1]]
-        sentence = " ".join(sentence)
+      try:
+        captions = generator.beam_search(sess, image)
+        final_caption = None
+        print("(%d / %d) Captions for image %s:" % (num_images_captioned, len(image_urls), url))
+        for i, caption in enumerate(captions):
+          # Ignore begin and end words.
+          sentence = [vocab.id_to_word(w) for w in caption.sentence[1:-1]]
+          sentence = " ".join(sentence)
 
-        if i == 0:
-          final_caption = sentence
+          if i == 0:
+            final_caption = sentence
 
-        print("  %d) %s (p=%f)" % (i, sentence, math.exp(caption.logprob)))
+          print("  %d) %s (p=%f)" % (i, sentence, math.exp(caption.logprob)))
+      except:
+        print("ERROR: Generating captions failed.")
+        num_failed += 1
+        continue
 
       # save caption
       if not final_caption:
         print("ERROR: Generating captions failed.")
+        num_failed += 1
         continue
+
       out_filename = url.split('/')[-1] + '.txt'
       with open(os.path.join('./captions', out_filename), 'w') as f:
         f.write(final_caption)
 
       # clean up downloaded image
       os.remove('image_tmp')
+
+    print("Num Failed: %d / %d" % (num_failed, len(image_urls)))
 
 
 if __name__ == "__main__":
