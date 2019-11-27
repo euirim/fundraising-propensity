@@ -20,9 +20,11 @@ from __future__ import print_function
 
 import math
 import os
-
+import urllib
+import cStringIO
 
 import tensorflow as tf
+from PIL import Image
 
 from im2txt import configuration
 from im2txt import inference_wrapper
@@ -35,7 +37,7 @@ tf.flags.DEFINE_string("checkpoint_path", "",
                        "Model checkpoint file or directory containing a "
                        "model checkpoint file.")
 tf.flags.DEFINE_string("vocab_file", "", "Text file containing the vocabulary.")
-tf.flags.DEFINE_string("input_files", "",
+tf.flags.DEFINE_string("input_image_urls", "",
                        "File pattern or comma-separated list of file patterns "
                        "of image files.")
 
@@ -54,11 +56,10 @@ def main(_):
   # Create the vocabulary.
   vocab = vocabulary.Vocabulary(FLAGS.vocab_file)
 
-  filenames = []
-  for file_pattern in FLAGS.input_files.split(","):
-    filenames.extend(tf.gfile.Glob(file_pattern))
-  tf.logging.info("Running caption generation on %d files matching %s",
-                  len(filenames), FLAGS.input_files)
+  image_urls = None
+  with open(FLAGS.input_image_urls, "r") as f:
+    image_urls = f.readlines()
+  tf.logging.info("Running caption generation on given image URLs")
 
   with tf.Session(graph=g) as sess:
     # Load the model from checkpoint.
@@ -69,16 +70,48 @@ def main(_):
     # available beam search parameters.
     generator = caption_generator.CaptionGenerator(model, vocab)
 
-    for filename in filenames:
-      with tf.gfile.GFile(filename, "rb") as f:
+    if not os.path.exists('./captions'):
+      os.makedirs('./captions') 
+
+    for url in image_urls:
+      if not url:
+        print("ERROR: URL is empty.")
+        continue
+
+      url = url.strip()
+
+      try:
+        urllib.urlretrieve(url, 'image_tmp')
+      except:
+        print("ERROR: Image download failed.")
+        continue
+
+      with tf.gfile.GFile('image_tmp', "rb") as f:
         image = f.read()
+
       captions = generator.beam_search(sess, image)
-      print("Captions for image %s:" % os.path.basename(filename))
+      final_caption = None
+      print("Captions for image %s:" % url)
       for i, caption in enumerate(captions):
         # Ignore begin and end words.
         sentence = [vocab.id_to_word(w) for w in caption.sentence[1:-1]]
         sentence = " ".join(sentence)
+
+        if i == 0:
+          final_caption = sentence
+
         print("  %d) %s (p=%f)" % (i, sentence, math.exp(caption.logprob)))
+
+      # save caption
+      if not final_caption:
+        print("ERROR: Generating captions failed.")
+        continue
+      out_filename = url.split('/')[-1] + '.txt'
+      with open(os.path.join('./captions', out_filename), 'w') as f:
+        f.write(final_caption)
+
+      # clean up downloaded image
+      os.remove('image_tmp')
 
 
 if __name__ == "__main__":

@@ -6,3 +6,4 @@
 /bazel-testlogs
 /bazel-tf
 model/mod*
+captions
