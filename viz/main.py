@@ -59,7 +59,7 @@ if __name__ == "__main__":
     if not os.path.exists('./tmp'):
         os.makedirs('./tmp')
 
-    title = 'Model error distributions on word2vec dataset.'
+    title = 'Model Error Distributions on word2vec Dataset.'
     model_types = [
         ('linear_regression', 'Linear Regression'),
         ('svr', 'SVR'),
@@ -67,7 +67,7 @@ if __name__ == "__main__":
         ('mlp', 'MLP')
     ]
     fig = plt.figure()
-    fig.suptitle(title, fontsize=23)
+    fig.set_title(title, pad=15)
     for i, (mt, model_name) in enumerate(model_types):
         print(f'Creating error distribution for {model_name}.')
         subplot_arg = int(f'22{i+1}')
