@@ -1,9 +1,9 @@
 import os
 import sys
 import pickle
-import matplotlib.pyplot as plt
 
-
+import matplotlib.pyplot as p, fontsize=16lt
+import numpy as np
 
 
 def create_hist(y_pred_fn, y_test_fn, title, subtitle, num_bins, output_fn):
@@ -33,9 +33,12 @@ def create_hist(y_pred_fn, y_test_fn, title, subtitle, num_bins, output_fn):
     # subtract arrays
     error = y_pred - y_test
 
+    # calc histogram range
+    ran = np.percentile(error, [5, 95])
+
     # plot histogram
     fig, ax = plt.subplots(nrows=1, ncols=1)
-    ax.hist(error, bins='auto')
+    ax.hist(error, bins='auto', range=ran)
     ax.title.set_text(subtitle)
     fig.suptitle(title, fontsize=24)
 
