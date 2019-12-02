@@ -93,4 +93,4 @@ if __name__ == "__main__":
     fig.subplots_adjust(hspace=0.5)
 
     # save histogram
-    fig.savefig('./tmp/error_hist.png', bbox_inches='tight')
+    fig.savefig('./tmp/error_hist.png', bbox_inches='tight', dpi=500)
