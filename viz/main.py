@@ -35,15 +35,15 @@ def create_hist(y_pred_fn, y_test_fn, title, subtitle, num_bins, output_fn):
 
     # calc histogram range
     ran = np.percentile(error, [1, 99])
-    print(f'Max error: {np.max()}')
-    print(f'Min error: {np.min()}')
+    print(f'Max error: {np.max(error)}')
+    print(f'Min error: {np.min(error)}')
 
     # plot histogram
     fig, ax = plt.subplots(nrows=1, ncols=1)
     ax.hist(error, bins='auto', range=ran)
     ax.title.set_text(subtitle)
-    ax.xlabel.('Error ($)')
-    ax.ylabel.('Frequency')
+    ax.xlabel('Error ($)')
+    ax.ylabel('Frequency')
     fig.suptitle(title, fontsize=23, y=0.5)
 
     # save histogram
