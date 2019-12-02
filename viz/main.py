@@ -67,7 +67,7 @@ if __name__ == "__main__":
         ('mlp', 'MLP')
     ]
     fig = plt.figure()
-    fig.set_title(title, pad=15)
+    fig.title.set_title(title, pad=15)
     for i, (mt, model_name) in enumerate(model_types):
         print(f'Creating error distribution for {model_name}.')
         subplot_arg = int(f'22{i+1}')
