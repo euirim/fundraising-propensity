@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 
-def create_hist(y_pred_fn, y_test_fn, title, num_bins, subplot):
+def create_hist(y_pred_fn, y_test_fn, title, num_bins, subplot, add_axes):
     """
     y_pred_fn: pickle filename
     y_test_fn: pickle filename
@@ -44,9 +44,9 @@ def create_hist(y_pred_fn, y_test_fn, title, num_bins, subplot):
     # plot histogram
     subplot.hist(error, bins='auto', range=ran)
     subplot.title.set_text(title)
-    subplot.set_xlabel('Error ($)')
-    subplot.set_ylabel('Frequency')
-
+    if add_axes:
+        subplot.set_xlabel('Error ($)')
+        subplot.set_ylabel('Frequency')
 
 def create_bar_chart():
     raise NotImplemented()
@@ -74,17 +74,23 @@ if __name__ == "__main__":
         ax = fig.add_subplot(subplot_arg)
         y_pred_fn = os.path.join(DATA_LOC, f'{mt}_y_pred.pkl')
         y_test_fn = os.path.join(DATA_LOC, f'{mt}_y_test.pkl')
+
+        add_axes = False
+        if i == (len(model_types) - 1):
+            add_axes = True
+
         create_hist(
             y_pred_fn,
             y_test_fn,
             model_name,
             NUM_HIST_BINS,
             ax,
+            add_axes,
         )
 
     # increase distance between subplots
-    fig.subplots_adjust(wspace=1.25)
-    fig.subplots_adjust(wspace=1.25)
+    fig.subplots_adjust(wspace=0.5)
+    fig.subplots_adjust(hspace=0.5)
 
     # save histogram
     fig.savefig('./tmp/error_hist.png', bbox_inches='tight')
