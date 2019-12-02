@@ -37,7 +37,7 @@ def create_hist(y_pred_fn, y_test_fn, title, num_bins, subplot):
     error = y_pred - y_test
 
     # calc histogram range
-    ran = np.percentile(error, [1, 99])
+    ran = np.percentile(error, [2.5, 97.5])
     print(f'Max error: {np.max(error)}')
     print(f'Min error: {np.min(error)}')
 
@@ -81,6 +81,10 @@ if __name__ == "__main__":
             NUM_HIST_BINS,
             ax,
         )
+
+    # increase distance between subplots
+    fig.subplots_adjust(wspace=1.25)
+    fig.subplots_adjust(wspace=1.25)
 
     # save histogram
     fig.savefig('./tmp/error_hist.png', bbox_inches='tight')
