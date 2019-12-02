@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 
-def create_hist(y_pred_fn, y_test_fn, title, subtitle, num_bins, output_fn):
+def create_hist(y_pred_fn, y_test_fn, title, num_bins, subplot):
     """
     y_pred_fn: pickle filename
     y_test_fn: pickle filename
@@ -39,15 +39,10 @@ def create_hist(y_pred_fn, y_test_fn, title, subtitle, num_bins, output_fn):
     print(f'Min error: {np.min(error)}')
 
     # plot histogram
-    fig, ax = plt.subplots(nrows=1, ncols=1)
-    ax.hist(error, bins='auto', range=ran)
-    ax.title.set_text(subtitle)
-    ax.set_xlabel('Error ($)')
-    ax.set_ylabel('Frequency')
-    fig.suptitle(title, fontsize=23, y=0.5)
-
-    # save histogram
-    fig.savefig(output_fn, bbox_inches='tight')
+    subplot.hist(error, bins='auto', range=ran)
+    subplot.title.set_text(subtitle)
+    subplot.set_xlabel('Error ($)')
+    subplot.set_ylabel('Frequency')
 
 
 def create_bar_chart():
@@ -55,23 +50,35 @@ def create_bar_chart():
 
 
 if __name__ == "__main__":
-    DATA_LOC = '../data/dataset_full_word2vec/250000'
+    DATA_LOC = '../data/dataset_full_word2vec/500000'
     NUM_HIST_BINS = 15
 
     if not os.path.exists('./tmp'):
         os.makedirs('./tmp')
 
-    dataset = 'Dataset\'s text features vectorized with word2vec.'
-    model_types = [('linear_regression', 'Linear Regression')]
-    for (mt, model_name) in model_types:
+    title = 'Model error distributions on word2vec dataset.'
+    model_types = [
+        ('linear_regression', 'Linear Regression'),
+        ('svr', 'SVR'),
+        ('random_forest', 'Random Forest'),
+        ('mlp', 'MLP')
+    ]
+    fig = plt.figure()
+    fig.suptitle(title, fontsize=23)
+    for i, (mt, model_name) in enumerate(model_types):
         print(f'Creating error distribution for {model_name}.')
+        subplot_arg = int(f'22{i}')
+        ax = fig.add_subplot(subplot_arg)
         y_pred_fn = os.path.join(DATA_LOC, f'{mt}_y_pred.pkl')
         y_test_fn = os.path.join(DATA_LOC, f'{mt}_y_test.pkl')
         create_hist(
             y_pred_fn,
             y_test_fn,
-            f'{model_name} Error Distribution',
-            dataset,
+            model_name,
             NUM_HIST_BINS,
-            os.path.join('./tmp', f'{mt}_error_hist.png'),
+            ax,
         )
+
+    output_fn = os.path.join('./tmp', f'error_hist.png'),
+    # save histogram
+    fig.savefig(output_fn, bbox_inches='tight')
