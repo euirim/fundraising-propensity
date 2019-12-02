@@ -42,8 +42,8 @@ def create_hist(y_pred_fn, y_test_fn, title, subtitle, num_bins, output_fn):
     fig, ax = plt.subplots(nrows=1, ncols=1)
     ax.hist(error, bins='auto', range=ran)
     ax.title.set_text(subtitle)
-    ax.xlabel('Error ($)')
-    ax.ylabel('Frequency')
+    ax.set_xlabel('Error ($)')
+    ax.set_ylabel('Frequency')
     fig.suptitle(title, fontsize=23, y=0.5)
 
     # save histogram
@@ -64,6 +64,7 @@ if __name__ == "__main__":
     dataset = 'Dataset\'s text features vectorized with word2vec.'
     model_types = [('linear_regression', 'Linear Regression')]
     for (mt, model_name) in model_types:
+        print(f'Creating error distribution for {model_name}.')
         y_pred_fn = os.path.join(DATA_LOC, f'{mt}_y_pred.pkl')
         y_test_fn = os.path.join(DATA_LOC, f'{mt}_y_test.pkl')
         create_hist(
