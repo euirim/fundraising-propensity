@@ -4,7 +4,7 @@ import pickle
 import matplotlib.pyplot as plt
 
 
-def create_hist(y_pred_fn, y_test_fn, title, subtitle=None, num_bins=10, output_fn):
+def create_hist(y_pred_fn, y_test_fn, title, subtitle, num_bins, output_fn):
     """
     y_pred_fn: pickle filename
     y_test_fn: pickle filename
