@@ -4,6 +4,8 @@ import pickle
 import matplotlib.pyplot as plt
 
 
+
+
 def create_hist(y_pred_fn, y_test_fn, title, subtitle, num_bins, output_fn):
     """
     y_pred_fn: pickle filename
@@ -33,7 +35,7 @@ def create_hist(y_pred_fn, y_test_fn, title, subtitle, num_bins, output_fn):
 
     # plot histogram
     fig, ax = plt.subplots(nrows=1, ncols=1)
-    ax.hist(error, num_bins)
+    ax.hist(error, bins='auto')
     ax.title.set_text(subtitle, fontsize=16)
     fig.suptitle(title)
 
