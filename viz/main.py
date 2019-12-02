@@ -2,7 +2,7 @@ import os
 import sys
 import pickle
 
-import matplotlib.pyplot as p, fontsize=16lt
+import matplotlib.pyplot as plt
 import numpy as np
 
 
