@@ -49,11 +49,8 @@ if __name__ == "__main__":
     DATA_LOC = '../data/dataset_full_word2vec/250000'
     NUM_HIST_BINS = 15
 
-    try:
-        os.makedirs('tmp')
-    except OSError as e:
-        if e.errno != errno.EEXIST:
-            raise
+    if not os.path.exists('./tmp'):
+        os.makedirs('./tmp')
 
     dataset = 'Dataset\'s text features vectorized with word2vec.'
     model_types = [('linear_regression', 'Linear Regression')]
