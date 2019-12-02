@@ -29,7 +29,7 @@ def create_hist(y_pred_fn, y_test_fn, title, subtitle, num_bins, output_fn):
         return
 
     # subtract arrays
-    error = y_pred - y_true
+    error = y_pred - y_test
 
     # plot histogram
     fig, ax = plt.subplots(nrows=1, ncols=1)
