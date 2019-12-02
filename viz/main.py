@@ -35,7 +35,7 @@ def create_hist(y_pred_fn, y_test_fn, title, subtitle, num_bins, output_fn):
     fig, ax = plt.subplots(nrows=1, ncols=1)
     ax.hist(error, num_bins)
     ax.title.set_text(title)
-    fig.subtitle.set_text(subtitle)
+    ax.subtitle.set_text(subtitle)
 
     # save histogram
     fig.savefig(output_fn, bbox_inches='tight')
