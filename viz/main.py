@@ -30,6 +30,9 @@ def create_hist(y_pred_fn, y_test_fn, title, num_bins, subplot):
         print(f'Unable to load y_pred pickle file. Reason: {err}.')
         return
 
+    # threshold to zero for negative predicted values
+    y_pred[y_pred < 0] = 0
+
     # subtract arrays
     error = y_pred - y_test
 
@@ -40,7 +43,7 @@ def create_hist(y_pred_fn, y_test_fn, title, num_bins, subplot):
 
     # plot histogram
     subplot.hist(error, bins='auto', range=ran)
-    subplot.title.set_text(subtitle)
+    subplot.title.set_text(title)
     subplot.set_xlabel('Error ($)')
     subplot.set_ylabel('Frequency')
 
@@ -67,7 +70,7 @@ if __name__ == "__main__":
     fig.suptitle(title, fontsize=23)
     for i, (mt, model_name) in enumerate(model_types):
         print(f'Creating error distribution for {model_name}.')
-        subplot_arg = int(f'22{i}')
+        subplot_arg = int(f'22{i+1}')
         ax = fig.add_subplot(subplot_arg)
         y_pred_fn = os.path.join(DATA_LOC, f'{mt}_y_pred.pkl')
         y_test_fn = os.path.join(DATA_LOC, f'{mt}_y_test.pkl')
@@ -79,6 +82,5 @@ if __name__ == "__main__":
             ax,
         )
 
-    output_fn = os.path.join('./tmp', f'error_hist.png'),
     # save histogram
-    fig.savefig(output_fn, bbox_inches='tight')
+    fig.savefig('./tmp/error_hist.png', bbox_inches='tight')
