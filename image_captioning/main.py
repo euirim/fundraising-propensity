@@ -31,7 +31,7 @@ def main():
             f.write(url + '\n')
 
     # get captions for each image URL and save to text file
-    call('./run.sh', shell=True)
+    call('./run.sh %s' % sys.argv[1], shell=True)
 
     # add new columns to dataframe for caption for cover and others
     df["cover_image_autocaption"] = np.nan
