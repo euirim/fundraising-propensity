@@ -19,7 +19,7 @@ def get_filename_from_url(url):
 def main():
     df = pd.read_csv(CSV_FILENAME, header=0)
     df = df[int(sys.argv[1]):min(int(sys.argv[1]) + 100000, df.shape[0])]
-    IMAGE_URLS_OUTPUT = f"./data/image_urls_{sys.argv[1]}.txt"
+    IMAGE_URLS_OUTPUT = "./data/image_urls_%s.txt" % sys.argv[1]
 
     # get all image URLs and save to text file
     cover_image_urls = [url for url in df['first_cover_image'].tolist() if str(url) != 'nan']
@@ -58,7 +58,7 @@ def main():
 
     # save new csv
     print "Saving CSV..."
-    NEW_CSV_OUTPUT = f"./out_{sys.argv[1]}.csv"
+    NEW_CSV_OUTPUT = "./out_%s.csv" % sys.argv[1]
     df.to_csv(NEW_CSV_OUTPUT)
 
 if __name__=="__main__":
