@@ -1,11 +1,11 @@
 import os
+import sys
+
 import pandas as pd
 from subprocess import call
 import numpy as np
 
 CSV_FILENAME = "./data/bert_200.csv"
-IMAGE_URLS_OUTPUT = "./data/image_urls.txt"
-NEW_CSV_OUTPUT = "./out.csv"
 CAPTIONS_DIR = "./captions"
 
 
@@ -17,7 +17,9 @@ def get_filename_from_url(url):
 
 
 def main():
-    df = pd.read_csv(CSV_FILENAME, header=0) 
+    df = pd.read_csv(CSV_FILENAME, header=0)
+    df = df[int(sys.argv[1]):min(int(sys.argv[1]) + 100000, df.shape[0])]
+    IMAGE_URLS_OUTPUT = f"./data/image_urls_{sys.argv[1]}.txt"
 
     # get all image URLs and save to text file
     cover_image_urls = [url for url in df['first_cover_image'].tolist() if str(url) != 'nan']
@@ -56,6 +58,7 @@ def main():
 
     # save new csv
     print "Saving CSV..."
+    NEW_CSV_OUTPUT = f"./out_{sys.argv[1]}.csv"
     df.to_csv(NEW_CSV_OUTPUT)
 
 if __name__=="__main__":
