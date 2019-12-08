@@ -134,7 +134,7 @@ def main(_):
   print("Chunk Size: %d" % chunk_size)
  
   chunks = [image_urls[x:x+chunk_size] for x in xrange(0, len(image_urls), chunk_size)]
-  with Pool(processes=mp.cpu_count()) as p:
+  with mp.Pool(processes=mp.cpu_count()) as p:
     p.map(worker, chunks)
 
 if __name__ == "__main__":
