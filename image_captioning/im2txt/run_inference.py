@@ -130,7 +130,7 @@ def main(_):
   with open(FLAGS.input_image_urls, "r") as f:
     image_urls = f.readlines()
   
-  chunk_size = len(image_urls) / mp.cpu_count()
+  chunk_size = math.ceil(len(image_urls) / mp.cpu_count())
   print("Chunk Size: %d" % chunk_size)
  
   chunks = [image_urls[x:x+chunk_size] for x in xrange(0, len(image_urls), chunk_size)]
