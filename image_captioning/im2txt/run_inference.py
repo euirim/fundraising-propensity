@@ -134,8 +134,9 @@ def main(_):
   print("Chunk Size: %d" % chunk_size)
  
   chunks = [image_urls[x:x+chunk_size] for x in xrange(0, len(image_urls), chunk_size)]
-  with mp.Pool(processes=mp.cpu_count()) as p:
-    p.map(worker, chunks)
+  pool = mp.Pool(processes=mp.cpu_count())
+  pool.map(worker, chunks)
+  pool.close()
 
 if __name__ == "__main__":
   tf.app.run()
