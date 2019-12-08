@@ -34,7 +34,7 @@ def get_image_urls():
                 f.write(url + '\n')
 
 def main():
-    if len(sys.argv) > 1 and sys.argv[1] != "--skip-image-urls":
+    if sys.argv[1] != "--skip-image-urls":
         print "Getting Image URLs"
         get_image_urls()
     
