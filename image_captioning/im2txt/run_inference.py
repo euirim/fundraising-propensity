@@ -84,11 +84,12 @@ def worker(image_urls):
 
       # Check if caption already exists. If so, ignore
       try:
-        out_filename = url.split('/')[-1] + '.txt'
+        out_filename = url.split('/')[-1].split('?')[0] + '.txt'
         if os.path.exists(os.path.join(CAPTIONS_DIR, out_filename)):
           continue
-      except:
-        pass
+      except Exception as err:
+        print("ERROR: Something went wrong when looking for existing caption.")
+        print(err)
 
       img_filename = 'image_tmp_%d' % idx
       try:
@@ -125,9 +126,13 @@ def worker(image_urls):
         num_failed += 1
         continue
 
-      out_filename = url.split('/')[-1] + '.txt'
-      with open(os.path.join(CAPTIONS_DIR, out_filename), 'w') as f:
-        f.write(final_caption)
+      try:
+        out_filename = url.split('/')[-1].split('?')[0] + '.txt'
+        with open(os.path.join(CAPTIONS_DIR, out_filename), 'w') as f:
+          f.write(final_caption)
+      except Exception as err:
+        print("ERROR: Couldn't save.")
+        print(err)
 
       # clean up downloaded image
       os.remove(img_filename)
