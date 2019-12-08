@@ -81,7 +81,7 @@ def worker(image_urls):
       url = url.strip()
 
       try:
-        img_filename = 'image_tmp_%' % url.split('/')[-1]
+        img_filename = 'image_tmp_%s' % url.split('/')[-1]
         urllib.urlretrieve(url, img_filename)
       except:
         print("ERROR: Image download failed.")
