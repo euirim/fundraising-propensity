@@ -46,6 +46,8 @@ tf.logging.set_verbosity(tf.logging.INFO)
 CAPTIONS_DIR = './captions_new'
 
 def worker(image_urls):
+  idx = image_urls[0]
+  image_urls = image_urls[1]
   # Build the inference graph.
   g = tf.Graph()
   with g.as_default():
@@ -80,8 +82,8 @@ def worker(image_urls):
 
       url = url.strip()
 
+      img_filename = 'image_tmp_%d' % idx
       try:
-        img_filename = 'image_tmp_%s' % url.split('/')[-1]
         urllib.urlretrieve(url, img_filename)
       except:
         print("ERROR: Image download failed.")
@@ -133,7 +135,7 @@ def main(_):
   chunk_size = int(math.ceil(len(image_urls) / float(mp.cpu_count())))
   print("Chunk Size: %d" % chunk_size)
  
-  chunks = [image_urls[x:x+chunk_size] for x in xrange(0, len(image_urls), chunk_size)]
+  chunks = [(i, image_urls[x:x+chunk_size]) for i, x in enumerate(xrange(0, len(image_urls), chunk_size))]
   pool = mp.Pool(processes=mp.cpu_count())
   pool.map(worker, chunks)
   pool.close()
