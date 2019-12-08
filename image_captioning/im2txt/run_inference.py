@@ -83,9 +83,12 @@ def worker(image_urls):
       url = url.strip()
 
       # Check if caption already exists. If so, ignore
-      out_filename = url.split('/')[-1] + '.txt'
-      if os.path.exists(os.path.join(CAPTIONS_DIR, out_filename)):
-        continue
+      try:
+        out_filename = url.split('/')[-1] + '.txt'
+        if os.path.exists(os.path.join(CAPTIONS_DIR, out_filename)):
+          continue
+      except:
+        pass
 
       img_filename = 'image_tmp_%d' % idx
       try:
@@ -141,7 +144,7 @@ def main(_):
   print("Chunk Size: %d" % chunk_size)
  
   chunks = [(i, image_urls[x:x+chunk_size]) for i, x in enumerate(xrange(0, len(image_urls), chunk_size))]
-  pool = mp.Pool(processes=mp.cpu_count() - 1)
+  pool = mp.Pool(processes=mp.cpu_count())
   pool.map(worker, chunks)
   pool.close()
 
