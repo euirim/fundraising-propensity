@@ -131,7 +131,7 @@ def main(_):
     image_urls = f.readlines()
   
   chunk_size = len(image_urls) / mp.cpu_count()
-  print "Chunk Size: %d" % chunk_size
+  print("Chunk Size: %d" % chunk_size)
  
   chunks = [image_urls[x:x+chunk_size] for x in xrange(0, len(image_urls), chunk_size)]
   with Pool(processes=mp.cpu_count()) as p:
