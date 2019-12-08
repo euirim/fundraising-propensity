@@ -11,7 +11,7 @@ CHECKPOINT_PATH="/app/model/model.ckpt-2000000"
 VOCAB_FILE="/app/model/word_counts.txt"
 
 # JPEG image file to caption.
-IMAGE_URLS_FILE="/app/data/image_urls_$1.txt"
+IMAGE_URLS_FILE="/app/data/image_urls.txt"
 
 # Build the inference binary.
 bazel build -c opt im2txt/run_inference

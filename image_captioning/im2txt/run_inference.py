@@ -21,6 +21,7 @@ from __future__ import print_function
 import math
 import os
 import urllib
+import multiprocessing as mp
 
 import tensorflow as tf
 from PIL import Image
@@ -42,7 +43,9 @@ tf.flags.DEFINE_string("input_image_urls", "",
 
 tf.logging.set_verbosity(tf.logging.INFO)
 
-def main(_):
+CAPTIONS_DIR = './captions_new'
+
+def worker(image_urls):
   # Build the inference graph.
   g = tf.Graph()
   with g.as_default():
@@ -54,9 +57,6 @@ def main(_):
   # Create the vocabulary.
   vocab = vocabulary.Vocabulary(FLAGS.vocab_file)
 
-  image_urls = None
-  with open(FLAGS.input_image_urls, "r") as f:
-    image_urls = f.readlines()
   tf.logging.info("Running caption generation on given image URLs")
 
   with tf.Session(graph=g) as sess:
@@ -68,8 +68,8 @@ def main(_):
     # available beam search parameters.
     generator = caption_generator.CaptionGenerator(model, vocab)
 
-    if not os.path.exists('./captions'):
-      os.makedirs('./captions') 
+    if not os.path.exists(CAPTIONS_DIR):
+      os.makedirs(CAPTIONS_DIR) 
 
     num_failed = 0
     for num_images_captioned, url in enumerate(image_urls):
@@ -81,13 +81,14 @@ def main(_):
       url = url.strip()
 
       try:
-        urllib.urlretrieve(url, 'image_tmp')
+        img_filename = 'image_tmp_%' % url.split('/')[-1]
+        urllib.urlretrieve(url, img_filename)
       except:
         print("ERROR: Image download failed.")
         num_failed += 1
         continue
 
-      with tf.gfile.GFile('image_tmp', "rb") as f:
+      with tf.gfile.GFile(img_filename, "rb") as f:
         image = f.read()
 
       try:
@@ -115,14 +116,26 @@ def main(_):
         continue
 
       out_filename = url.split('/')[-1] + '.txt'
-      with open(os.path.join('./captions', out_filename), 'w') as f:
+      with open(os.path.join(CAPTIONS_DIR, out_filename), 'w') as f:
         f.write(final_caption)
 
       # clean up downloaded image
-      os.remove('image_tmp')
+      os.remove(img_filename)
 
     print("Num Failed: %d / %d" % (num_failed, len(image_urls)))
 
+
+def main(_):
+  image_urls = None
+  with open(FLAGS.input_image_urls, "r") as f:
+    image_urls = f.readlines()
+  
+  chunk_size = len(image_urls) / mp.cpu_count()
+  print "Chunk Size: %d" % chunk_size
+ 
+  chunks = [image_urls[x:x+chunk_size] for x in xrange(0, len(image_urls), chunk_size)]
+  with Pool(processes=mp.cpu_count()) as p:
+    p.map(worker, chunks)
 
 if __name__ == "__main__":
   tf.app.run()
