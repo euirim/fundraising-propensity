@@ -20,6 +20,8 @@ dataset = []
 nlp = spacy.load('en_core_web_lg')
 title_vectorization_technique = 'bert'
 story_vectorization_technique = 'doc2vec'
+cover_image_vectorization_technique = 'word2vec'
+story_image_vectorization_technique = 'word2vec'
 
 out_file = open('dataset_' + str(start_range) + '_' + str(end_range) + '.csv','w')
 out_writer = csv.writer(out_file, delimiter=',')
@@ -43,7 +45,7 @@ def get_bert_vec(bert_model, input_str):
     result = bert_model.encode([input_str])
     return list(result[0])
 
-with open('data/out_full2.csv') as csv_file:
+with open('data/captioned_small.csv') as csv_file:
     csv_reader = csv.reader(csv_file, delimiter=',')
     line_counter = 0
     num_rows = sum(1 for row in csv_reader)
@@ -57,7 +59,9 @@ with open('data/out_full2.csv') as csv_file:
             continue
         if end_range != -1 and line_counter == end_range:
             break
-        url,title,story,created,raised,goal,category,finished,first_cover_image,story_images = row
+        rownum, url,title,story,created,goal,category,finished,first_cover_image,story_images, raised, cover_image_autocaption, story_images_autocaption, story_image_autocaption = row
+        print(row)
+        exit(0)
         #title, story, created, raised, goal, category, finished = row
          
         if title_vectorization_technique == 'word2vec':
@@ -79,6 +83,16 @@ with open('data/out_full2.csv') as csv_file:
             story_vec = get_story_doc2vec(story_doc2vec_model, story)
         else:
             print("Error: An invalid story vectorization technique was selected.")
+
+        if cover_image_vectorization_technique == 'word2vec':
+            cover_image_vec = get_average_word2vec(cover_image_autocaption)
+        else:
+            print("Error: An invalid cover image vectorization technique was selected.")
+        
+        if story_image_vectorization_technique == 'word2vec':
+            story_image_vec = get_average_word2vec(story_image_autocaption)
+        else:
+            print("Error: An invalid story image vectorization technique was selected.")
 
         ycreated, mcreated, dcreated = created.split('-')
         created = int(datetime.datetime(int(ycreated), int(mcreated), int(dcreated), 0, 0).timestamp())
@@ -102,12 +116,16 @@ with open('data/out_full2.csv') as csv_file:
         out_row = [url,str(title).replace("\n"," "),str(story).replace("\n"," "),created,goal,category,finished,first_cover_image,story_images]
         out_row.extend(title_vec)
         out_row.extend(story_vec)
+        out_row.extend(cover_image_vec)
+        out_row.extend(story_image_vec)
         out_row.append(raised)
 
         if line_counter == 1:
             headings = ["url","title","story","created","goal","category","finished","first_cover_image","story_images"]
             headings.extend(["title_vec_{}".format(i) for i in range(0, len(title_vec))])
             headings.extend(["story_vec_{}".format(i) for i in range(0, len(story_vec))])
+            headings.extend(["cover_image_vec_{}".format(i) for i in range(0, len(cover_image_vec))])
+            headings.extend(["story_image_vec_{}".format(i) for i in range(0, len(story_image_vec))])
             headings.append("raised")
             out_writer.writerow(headings)
 
