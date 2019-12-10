@@ -10,7 +10,7 @@ from sentence_transformers import SentenceTransformer
 
 start_range, end_range = int(sys.argv[1]), int(sys.argv[2]) # Set both to -1 to read full file
 skip_completed_campaigns = True # Don't read campaigns that have unknown goal due to being completed. If set to False, goal is set to 0.
-output_documents = False # If True, outputs .txt file of each story and title to data/documents
+output_documents = True # If True, outputs .txt file of each story and title to data/documents
 
 with open(sys.argv[3], 'rb') as pickle_file:
     categories = pickle.load(pickle_file)
@@ -18,15 +18,15 @@ with open(sys.argv[3], 'rb') as pickle_file:
 num_categories = 0
 dataset = []
 nlp = spacy.load('en_core_web_lg')
-title_vectorization_technique = 'bert'
-story_vectorization_technique = 'doc2vec'
+title_vectorization_technique = 'word2vec'
+story_vectorization_technique = 'word2vec'
 cover_image_vectorization_technique = 'word2vec'
 story_image_vectorization_technique = 'word2vec'
 
 out_file = open('dataset_' + str(start_range) + '_' + str(end_range) + '.csv','w')
 out_writer = csv.writer(out_file, delimiter=',')
 
-bert_model = SentenceTransformer('bert-base-nli-mean-tokens')
+#bert_model = SentenceTransformer('bert-base-nli-mean-tokens')
 
 def get_average_word2vec(input_str):
     input_str = nlp(input_str)
@@ -45,7 +45,7 @@ def get_bert_vec(bert_model, input_str):
     result = bert_model.encode([input_str])
     return list(result[0])
 
-with open('data/captioned_small.csv') as csv_file:
+with open('data/captioned_no_vectors.csv') as csv_file:
     csv_reader = csv.reader(csv_file, delimiter=',')
     line_counter = 0
     num_rows = sum(1 for row in csv_reader)
@@ -60,8 +60,7 @@ with open('data/captioned_small.csv') as csv_file:
         if end_range != -1 and line_counter == end_range:
             break
         rownum, url,title,story,created,goal,category,finished,first_cover_image,story_images, raised, cover_image_autocaption, story_images_autocaption, story_image_autocaption = row
-        print(row)
-        exit(0)
+
         #title, story, created, raised, goal, category, finished = row
          
         if title_vectorization_technique == 'word2vec':
@@ -84,6 +83,13 @@ with open('data/captioned_small.csv') as csv_file:
         else:
             print("Error: An invalid story vectorization technique was selected.")
 
+
+        if len(cover_image_autocaption.strip()) < 2:
+            cover_image_autocaption = "No caption available."
+
+        if len(story_image_autocaption.strip()) < 2:
+            story_image_autocaption = "No caption available."
+
         if cover_image_vectorization_technique == 'word2vec':
             cover_image_vec = get_average_word2vec(cover_image_autocaption)
         else:
@@ -94,8 +100,8 @@ with open('data/captioned_small.csv') as csv_file:
         else:
             print("Error: An invalid story image vectorization technique was selected.")
 
-        ycreated, mcreated, dcreated = created.split('-')
-        created = int(datetime.datetime(int(ycreated), int(mcreated), int(dcreated), 0, 0).timestamp())
+        #ycreated, mcreated, dcreated = created.split('-')
+        #created = int(datetime.datetime(int(ycreated), int(mcreated), int(dcreated), 0, 0).timestamp())
         
         raised = int(raised)
 
@@ -105,13 +111,15 @@ with open('data/captioned_small.csv') as csv_file:
         else:
             goal = int(goal)
 
-        category = categories[category]
+        #category = categories[category]
 
         finished = int(finished)
 
         if output_documents:
             print(story,  file=open(os.path.join('data','documents','story',str(rownum)+'.txt'), 'w'))
             print(title,  file=open(os.path.join('data','documents','title',str(rownum)+'.txt'), 'w'))
+            print(cover_image_autocaption,  file=open(os.path.join('data','documents','caption',str(rownum)+'.txt'), 'w'))
+            print(story_image_autocaption,  file=open(os.path.join('data','documents','caption',str(int(num_rows)+int(rownum))+'.txt'), 'w'))
 
         out_row = [url,str(title).replace("\n"," "),str(story).replace("\n"," "),created,goal,category,finished,first_cover_image,story_images]
         out_row.extend(title_vec)
