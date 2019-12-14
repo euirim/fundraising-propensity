@@ -27,6 +27,7 @@ def main():
         # add new columns to dataframe for caption for cover and others
         df["cover_image_autocaption"] = np.nan
         df["story_images_autocaption"] = np.nan
+        df = df.astype({"cover_image_autocaption": str, "story_images_autocaption": str})
 
         # associate captions to appropriate rows/columns
         for index, row in df.iterrows():
@@ -35,7 +36,7 @@ def main():
             if cover_fn:
                 try:
                     with open(os.path.join(CAPTIONS_DIR, cover_fn + '.txt'), "r") as f:
-                        df['cover_image_autocaption'] = f.read()
+                        df.at[index, 'cover_image_autocaption'] = f.read()
                 except IOError as err:
                     print "Error. Something went wrong."
                     print err
@@ -56,7 +57,7 @@ def main():
                         print err
                         num_failed += 1
 
-            df["story_image_autocaption"] = ' '.join(captions)
+            df.at[index, 'story_image_autocaption'] = ' '.join(captions)
 
         # save new csv
         NEW_CSV_OUTPUT = "./out_final.csv"

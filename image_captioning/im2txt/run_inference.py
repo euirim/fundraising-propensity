@@ -43,7 +43,7 @@ tf.flags.DEFINE_string("input_image_urls", "",
 
 tf.logging.set_verbosity(tf.logging.INFO)
 
-CAPTIONS_DIR = './captions_new'
+CAPTIONS_DIR = './captions_final'
 
 def worker(image_urls):
   idx = image_urls[0]
@@ -85,13 +85,14 @@ def worker(image_urls):
       # Check if caption already exists. If so, ignore
       try:
         out_filename = url.split('/')[-1].split('?')[0] + '.txt'
+
         if os.path.exists(os.path.join(CAPTIONS_DIR, out_filename)):
           continue
       except Exception as err:
         print("ERROR: Something went wrong when looking for existing caption.")
         print(err)
 
-      img_filename = 'image_tmp_%d' % idx
+      img_filename = './tmp_images/%s' % out_filename
       try:
         urllib.urlretrieve(url, img_filename)
       except:
@@ -118,12 +119,14 @@ def worker(image_urls):
       except:
         print("ERROR: Generating captions failed.")
         num_failed += 1
+        os.remove(img_filename)
         continue
 
       # save caption
       if not final_caption:
         print("ERROR: Generating captions failed.")
         num_failed += 1
+        os.remove(img_filename)
         continue
 
       try:
@@ -145,7 +148,7 @@ def main(_):
   with open(FLAGS.input_image_urls, "r") as f:
     image_urls = f.readlines()
   
-  chunk_size = 10000
+  chunk_size = 5000
   print("Chunk Size: %d" % chunk_size)
  
   chunks = [(i, image_urls[x:x+chunk_size]) for i, x in enumerate(xrange(0, len(image_urls), chunk_size))]
