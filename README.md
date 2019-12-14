@@ -37,6 +37,16 @@ python build_csv.py
 ## Text Embedding
 
 ## Experiments
+Navigate to the `Experiments` folder in this repo. Assuming you have a CSV of the preprocessed data
+(so categories are one-hot encoded and image captions/text features are vectorized), the `models.py`
+script can be run as follows:
+
+```sh
+python3 models.py <model_name> <csv_file_name>
+```
+
+Here, `<csv_file_name>` should refer to the name of the CSV file that needs to be trained on, and
+`<model_name>` can be one of: `linear_regression`, `svr`, `random_forest`, or `mlp`.
 
 ## Data Sample
 
