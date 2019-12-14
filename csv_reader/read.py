@@ -12,8 +12,8 @@ start_range, end_range = int(sys.argv[1]), int(sys.argv[2]) # Set both to -1 to 
 skip_completed_campaigns = True # Don't read campaigns that have unknown goal due to being completed. If set to False, goal is set to 0.
 output_documents = True # If True, outputs .txt file of each story and title to data/documents
 
-with open(sys.argv[3], 'rb') as pickle_file:
-    categories = pickle.load(pickle_file)
+#with open(sys.argv[3], 'rb') as pickle_file:
+#    categories = pickle.load(pickle_file)
 
 num_categories = 0
 dataset = []
@@ -26,7 +26,7 @@ story_image_vectorization_technique = 'word2vec'
 out_file = open('dataset_' + str(start_range) + '_' + str(end_range) + '.csv','w')
 out_writer = csv.writer(out_file, delimiter=',')
 
-#bert_model = SentenceTransformer('bert-base-nli-mean-tokens')
+bert_model = SentenceTransformer('bert-base-nli-mean-tokens')
 
 def get_average_word2vec(input_str):
     input_str = nlp(input_str)
