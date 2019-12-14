@@ -36,6 +36,37 @@ python build_csv.py
 
 ## Text Embedding
 
+The `read_csv/read.py` script can be used to create vector representations of text features. It takes as input a CSV with the following columns, which can be obtained by running the crawler and image captioning scripts:
+
+* rownum
+* url
+* title
+* story
+* created
+* goal
+* category
+* finished
+* first_cover_image
+* story_images
+* raised
+* cover_image_autocaption
+* story_images_autocaption
+* story_image_autocaption
+
+An example of a properly formatted input CSV can be found in `data/data_sample.csv`.
+
+To run, edit the `with open...` line to provide the path to the input CSV. Edit the `...vectorization_technique` variables to specify the desired text embedding techniques. For titles and captions, `doc2vec`, `word2vec`, and `bert` are supported. For stories, `doc2vec` and `word2vec` are supported.
+
+Then call the script with:
+
+`python read_csv/read.py start_row end_row`
+
+or 
+
+`python read_csv/read.py -1 -1`
+
+to process the full file. Output will be saved to the project root directory.
+
 ## Experiments
 Navigate to the `Experiments` folder in this repo. Assuming you have a CSV of the preprocessed data
 (so categories are one-hot encoded and image captions/text features are vectorized), the `models.py`
@@ -49,6 +80,8 @@ Here, `<csv_file_name>` should refer to the name of the CSV file that needs to b
 `<model_name>` can be one of: `linear_regression`, `svr`, `random_forest`, or `mlp`.
 
 ## Data Sample
+
+A sample of our raw data can be found in `data/data_sample.csv`.
 
 ## Contributors
 Nikhil Athreya, Euirim Choi, Anthony Li
